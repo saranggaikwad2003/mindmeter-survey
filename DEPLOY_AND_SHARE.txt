@@ -1,0 +1,9 @@
+HOW TO SHARE THIS SURVEY WITH STUDENTS
+1. Test the website locally using README.txt instructions.
+2. Deploy the Flask app to a Python-compatible host. Replit/Render plans and deployment options can change.
+3. Configure a strong admin password and secret key before first database initialization.
+4. Make sure data/responses.db is stored on persistent storage; otherwise data can be lost after restart/redeploy.
+5. Open the public site URL. Click "Copy survey link" or "Share on WhatsApp".
+6. Share only the /survey link with students. Never share /admin credentials.
+7. Collect responses only after supervisor/college approval, with voluntary informed consent, from adults aged 18+.
+LOCAL TEST NOTE: http://127.0.0.1:5000 only works on the computer running the app; it is not a public link.
