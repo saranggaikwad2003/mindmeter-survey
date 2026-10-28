@@ -12,21 +12,16 @@ ADMIN_USER = os.environ.get("MINDMETER_ADMIN_USER", "admin")
 ADMIN_PASS = os.environ.get("MINDMETER_ADMIN_PASSWORD", "ChangeMe123!")
 
 QUESTIONS = [
-    {"key":"daily_hours","label":"1. How many hours do you use your smartphone daily?","type":"choice","options":["0–2 hours","2–4 hours","4–6 hours","6–8 hours","More than 8 hours"]},
-    {"key":"main_use","label":"2. What is your main purpose for using a smartphone?","type":"choice","options":["Study or learning","Social media","Gaming","Videos or entertainment","Communication","Other"]},
-    {"key":"bedtime","label":"3. How often do you use your phone after going to bed?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"study_distraction","label":"4. How often does your phone distract you while studying?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"unplanned","label":"5. How often do you use your phone longer than you planned?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"reduce_difficult","label":"6. I have tried to reduce phone use but found it difficult.","type":"choice","options":["Strongly disagree","Disagree","Neither agree nor disagree","Agree","Strongly agree"]},
-    {"key":"sleep_effect","label":"7. How often does smartphone use affect your sleep?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"notifications","label":"8. How often do you check notifications while studying?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"delayed_tasks","label":"9. How often do you delay important tasks because of smartphone use?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"academic_impact","label":"10. How much does smartphone use affect your academic work?","type":"choice","options":["Not at all","A little","Moderately","A lot","Extremely"]},
-    {"key":"anxious","label":"11. How often do you feel uncomfortable when you cannot access your phone?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"night_check","label":"12. How often do you check your phone during the night?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"social_interrupt","label":"13. How often do phone notifications interrupt conversations with people?","type":"choice","options":["Never","Rarely","Sometimes","Often","Very often"]},
-    {"key":"control_attempt","label":"14. Have you tried to reduce your smartphone screen time?","type":"choice","options":["Yes, and succeeded","Yes, but found it difficult","Yes, but did not succeed","No, never tried"]},
-    {"key":"comment","label":"15. Optional comment (do not include personal identifying information)","type":"text","options":[]},
+    {"key":"age_group","label":"1. What is your age group?","type":"choice","options":["Under 18","18-20","21-23","24 or above"]},
+    {"key":"study_level","label":"2. What is your current education level?","type":"choice","options":["Undergraduate","Postgraduate","Other"]},
+    {"key":"daily_hours","label":"3. How many hours do you use your smartphone daily?","type":"choice","options":["0-2 hours","2-4 hours","4-6 hours","More than 6 hours"]},
+    {"key":"main_use","label":"4. What is your main purpose for using a smartphone?","type":"choice","options":["Study or learning","Social media","Gaming","Entertainment","Communication","Other"]},
+    {"key":"morning_check","label":"5. Do you check your phone immediately after waking up?","type":"choice","options":["Never","Rarely","Sometimes","Often","Always"]},
+    {"key":"study_distraction","label":"6. Does smartphone use distract you while studying?","type":"choice","options":["Never","Rarely","Sometimes","Often","Always"]},
+    {"key":"sleep_effect","label":"7. How often does smartphone use affect your sleep?","type":"choice","options":["Never","Rarely","Sometimes","Often","Always"]},
+    {"key":"distracted","label":"8. Do you feel distracted because of your smartphone?","type":"choice","options":["Never","Rarely","Sometimes","Often","Always"]},
+    {"key":"reduce_attempt","label":"9. Have you tried to reduce your smartphone usage?","type":"choice","options":["Yes","No"]},
+    {"key":"academic_impact","label":"10. How much does smartphone use affect your academic performance?","type":"choice","options":["Not at all","A little","Moderately","A lot"]}
 ]
 
 def db():
