@@ -109,9 +109,15 @@ def survey():
                 answers[q["key"]] = request.form.get(q["key"],"").strip()[:1000]
             else:
                 val = request.form.get(q["key"], "")
-                if val not in [str(i) for i in range(len(q["options"]))]:
-                    flash("Please answer all required questions.", "warning")
-                    return redirect(url_for("survey"))
+              
+if val not in [str(i) for i in range(len(q["options"]))]:
+    print("INVALID SURVEY ANSWER:", q["key"], repr(val))
+    flash(
+        f"Please check your answer for: {q['label']}",
+        "warning"
+    )
+    return redirect(url_for("survey"))
+
                 answers[q["key"]] = int(val)
         score, indicator = calculate_score(answers)
         with db() as c:
