@@ -7,65 +7,38 @@ import secrets
 from datetime import datetime, timezone
 from functools import wraps
 
-from flask import (
-    Flask, render_template, request, redirect,
-    url_for, session, flash, Response
-)
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(ROOT, "data", "responses.db")
 
 app = Flask(__name__)
-app.secret_key = os.environ.get(
-    "MINDMETER_SECRET_KEY", secrets.token_hex(32)
-)
+app.secret_key = os.environ.get("MINDMETER_SECRET_KEY", secrets.token_hex(32))
 
 ADMIN_USER = os.environ.get("MINDMETER_ADMIN_USER", "admin")
-ADMIN_PASS = os.environ.get(
-    "MINDMETER_ADMIN_PASSWORD", "ChangeMe123!"
-)
+ADMIN_PASS = os.environ.get("MINDMETER_ADMIN_PASSWORD", "ChangeMe123!")
 
 QUESTIONS = [
-    {"key": "age_group", "label": "1. What is your age group?",
-     "type": "choice",
+    {"key": "age_group", "label": "1. What is your age group?", "type": "choice",
      "options": ["Under 18", "18-20", "21-23", "24 or above"]},
-
-    {"key": "study_level", "label": "2. What is your current education level?",
-     "type": "choice",
+    {"key": "study_level", "label": "2. What is your current education level?", "type": "choice",
      "options": ["Undergraduate", "Postgraduate", "Other"]},
-
-    {"key": "daily_hours", "label": "3. How many hours do you use your smartphone daily?",
-     "type": "choice",
+    {"key": "daily_hours", "label": "3. How many hours do you use your smartphone daily?", "type": "choice",
      "options": ["0-2 hours", "2-4 hours", "4-6 hours", "More than 6 hours"]},
-
-    {"key": "main_use", "label": "4. What is your main purpose for using a smartphone?",
-     "type": "choice",
-     "options": ["Study or learning", "Social media", "Gaming",
-                 "Entertainment", "Communication", "Other"]},
-
-    {"key": "morning_check", "label": "5. Do you check your phone immediately after waking up?",
-     "type": "choice",
+    {"key": "main_use", "label": "4. What is your main purpose for using a smartphone?", "type": "choice",
+     "options": ["Study or learning", "Social media", "Gaming", "Entertainment", "Communication", "Other"]},
+    {"key": "morning_check", "label": "5. Do you check your phone immediately after waking up?", "type": "choice",
      "options": ["Never", "Rarely", "Sometimes", "Often", "Always"]},
-
-    {"key": "study_distraction", "label": "6. Does smartphone use distract you while studying?",
-     "type": "choice",
+    {"key": "study_distraction", "label": "6. Does smartphone use distract you while studying?", "type": "choice",
      "options": ["Never", "Rarely", "Sometimes", "Often", "Always"]},
-
-    {"key": "sleep_effect", "label": "7. How often does smartphone use affect your sleep?",
-     "type": "choice",
+    {"key": "sleep_effect", "label": "7. How often does smartphone use affect your sleep?", "type": "choice",
      "options": ["Never", "Rarely", "Sometimes", "Often", "Always"]},
-
-    {"key": "distracted", "label": "8. Do you feel distracted because of your smartphone?",
-     "type": "choice",
+    {"key": "distracted", "label": "8. Do you feel distracted because of your smartphone?", "type": "choice",
      "options": ["Never", "Rarely", "Sometimes", "Often", "Always"]},
-
-    {"key": "reduce_attempt", "label": "9. Have you tried to reduce your smartphone usage?",
-     "type": "choice",
+    {"key": "reduce_attempt", "label": "9. Have you tried to reduce your smartphone usage?", "type": "choice",
      "options": ["Yes", "No"]},
-
-    {"key": "academic_impact", "label": "10. How much does smartphone use affect your academic performance?",
-     "type": "choice",
+    {"key": "academic_impact", "label": "10. How much does smartphone use affect your academic performance?", "type": "choice",
      "options": ["Not at all", "A little", "Moderately", "A lot"]},
 ]
 
@@ -85,7 +58,6 @@ def init_db():
                 password_hash TEXT NOT NULL
             )
         """)
-
         conn.execute("""
             CREATE TABLE IF NOT EXISTS responses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,12 +69,9 @@ def init_db():
                 indicator TEXT NOT NULL
             )
         """)
-
         existing = conn.execute(
-            "SELECT username FROM admins WHERE username = ?",
-            (ADMIN_USER,)
+            "SELECT username FROM admins WHERE username = ?", (ADMIN_USER,)
         ).fetchone()
-
         if not existing:
             conn.execute(
                 "INSERT INTO admins(username, password_hash) VALUES (?, ?)",
@@ -121,7 +90,7 @@ def admin_required(fn):
 
 
 def calculate_score(answers):
-    # Exploratory indicator only; not a clinical diagnosis.
+    # Exploratory indicator only; not a validated clinical test.
     score_keys = [
         "morning_check",
         "study_distraction",
@@ -130,20 +99,13 @@ def calculate_score(answers):
         "academic_impact"
     ]
 
-    score = 0
-
-    for key in score_keys:
-        try:
-            score += int(answers.get(key, 0))
-        except (ValueError, TypeError):
-            pass
+    score = sum(int(answers.get(key, 0)) for key in score_keys)
 
     if score <= 6:
         return score, "Lower indicator"
     elif score <= 12:
         return score, "Moderate indicator"
-    else:
-        return score, "Higher indicator"
+    return score, "Higher indicator"
 
 
 @app.route("/")
@@ -154,27 +116,15 @@ def index():
         ).fetchall()
 
     total = len(rows)
-
-    hour_options = [
-        "0-2 hours", "2-4 hours",
-        "4-6 hours", "More than 6 hours"
-    ]
+    hour_options = ["0-2 hours", "2-4 hours", "4-6 hours", "More than 6 hours"]
+    hour_values = {"0-2 hours": 1, "2-4 hours": 3, "4-6 hours": 5, "More than 6 hours": 7}
 
     use_counts = {option: 0 for option in hour_options}
-
     indicator_counts = {
         "Lower indicator": 0,
         "Moderate indicator": 0,
         "Higher indicator": 0
     }
-
-    hour_values = {
-        "0-2 hours": 1,
-        "2-4 hours": 3,
-        "4-6 hours": 5,
-        "More than 6 hours": 7
-    }
-
     hours = []
     higher = 0
 
@@ -185,17 +135,13 @@ def index():
             answers = {}
 
         value = answers.get("daily_hours")
-
         if isinstance(value, int) and 0 <= value < len(hour_options):
             option = hour_options[value]
             use_counts[option] += 1
             hours.append(hour_values[option])
 
         indicator = row["indicator"]
-        indicator_counts[indicator] = (
-            indicator_counts.get(indicator, 0) + 1
-        )
-
+        indicator_counts[indicator] = indicator_counts.get(indicator, 0) + 1
         if indicator == "Higher indicator":
             higher += 1
 
@@ -217,10 +163,7 @@ def survey():
         return render_template("survey.html", questions=QUESTIONS)
 
     if request.form.get("consent") != "yes":
-        flash(
-            "Please confirm that you are 18 or older and consent to participate.",
-            "warning"
-        )
+        flash("Please confirm that you are 18 or older and consent to participate.", "warning")
         return redirect(url_for("survey"))
 
     answers = {}
@@ -228,31 +171,19 @@ def survey():
     for question in QUESTIONS:
         key = question["key"]
         value = request.form.get(key, "")
-
-        valid_values = [
-            str(i) for i in range(len(question["options"]))
-        ]
+        valid_values = [str(i) for i in range(len(question["options"]))]
 
         if value not in valid_values:
-            flash(
-                f"Please check your answer for: {question['label']}",
-                "warning"
-            )
+            flash(f"Please check your answer for: {question['label']}", "warning")
             return redirect(url_for("survey"))
 
         answers[key] = int(value)
 
-    # Do not accept under-18 responses in this 18+ survey.
     if answers["age_group"] == 0:
-        flash(
-            "This survey is only for participants aged 18 or older.",
-            "warning"
-        )
+        flash("This survey is only for participants aged 18 or older.", "warning")
         return redirect(url_for("survey"))
 
-    study_options = QUESTIONS[1]["options"]
-    study_level = study_options[answers["study_level"]]
-
+    study_level = QUESTIONS[1]["options"][answers["study_level"]]
     score, indicator = calculate_score(answers)
 
     with db() as conn:
@@ -269,11 +200,7 @@ def survey():
             indicator
         ))
 
-    return render_template(
-        "thanks.html",
-        score=score,
-        indicator=indicator
-    )
+    return render_template("thanks.html", score=score, indicator=indicator)
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -284,8 +211,7 @@ def admin_login():
 
         with db() as conn:
             row = conn.execute(
-                "SELECT * FROM admins WHERE username = ?",
-                (username,)
+                "SELECT * FROM admins WHERE username = ?", (username,)
             ).fetchone()
 
         if row and check_password_hash(row["password_hash"], password):
@@ -312,30 +238,22 @@ def admin_dashboard():
         ).fetchall()
 
     records = []
-
     for row in rows:
         record = dict(row)
-
         try:
             record["answers"] = json.loads(record["answers"])
         except (json.JSONDecodeError, TypeError):
             record["answers"] = {}
-
         records.append(record)
 
     total = len(records)
-
-    avg = (
-        round(sum(r["score"] for r in records) / total, 1)
-        if total else 0
-    )
+    avg = round(sum(r["score"] for r in records) / total, 1) if total else 0
 
     indicators = {
         "Lower indicator": 0,
         "Moderate indicator": 0,
         "Higher indicator": 0
     }
-
     for record in records:
         name = record["indicator"]
         indicators[name] = indicators.get(name, 0) + 1
@@ -360,7 +278,6 @@ def export_csv():
 
     output = io.StringIO()
     writer = csv.writer(output)
-
     writer.writerow(
         ["response_id", "created_at_utc", "study_level", "score", "indicator"]
         + [q["key"] for q in QUESTIONS]
@@ -373,22 +290,15 @@ def export_csv():
             answers = {}
 
         writer.writerow(
-            [
-                row["id"],
-                row["created_at"],
-                row["study_level"],
-                row["score"],
-                row["indicator"]
-            ] + [answers.get(q["key"], "") for q in QUESTIONS]
+            [row["id"], row["created_at"], row["study_level"],
+             row["score"], row["indicator"]]
+            + [answers.get(q["key"], "") for q in QUESTIONS]
         )
 
     return Response(
         output.getvalue(),
         mimetype="text/csv",
-        headers={
-            "Content-Disposition":
-            "attachment; filename=mindmeter_responses.csv"
-        }
+        headers={"Content-Disposition": "attachment; filename=mindmeter_responses.csv"}
     )
 
 
