@@ -119,11 +119,25 @@ def survey():
             answers[q["key"]] = int(val)
 
     score, indicator = calculate_score(answers)
-        with db() as c:
-            c.execute("INSERT INTO responses(created_at,age_confirmed,study_level,answers,score,indicator) VALUES(?,?,?,?,?,?)",
-                      (datetime.now(timezone.utc).isoformat(timespec="seconds"),1,study_level,json.dumps(answers),score,indicator))
-        return render_template("thanks.html", score=score, indicator=indicator)
-    return render_template("survey.html", questions=QUESTIONS)
+
+    with db() as c:
+        c.execute(
+            "INSERT INTO responses(created_at,age_confirmed,study_level,answers,score,indicator) VALUES(?,?,?,?,?,?)",
+            (
+                datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                1,
+                study_level,
+                json.dumps(answers),
+                score,
+                indicator
+            )
+        )
+
+    return render_template(
+        "thanks.html",
+        score=score,
+        indicator=indicator
+    )
 
 @app.route("/admin/login", methods=["GET","POST"])
 def admin_login():
