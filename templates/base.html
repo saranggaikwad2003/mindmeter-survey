@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Student Digital Wellbeing{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head>
+<body><header class="top"><div class="brand">◇ Student Digital Wellbeing</div><div class="sub">MCA Research Prototype · Smartphone-use patterns among college students</div></header>
+<nav class="nav"><a href="/" class="{% if request.path=='/' %}active{% endif %}">Dashboard</a><a href="/survey" class="{% if request.path=='/survey' %}active{% endif %}">Student Survey</a><a href="/admin/login">Admin Login</a><a href="/about">About Project</a></nav>
+<main class="wrap">{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}{% block content %}{% endblock %}</main>
+<footer>Student Digital Wellbeing · Educational research prototype · Not a medical test</footer></body></html>
