@@ -103,26 +103,40 @@ def survey():
         if study_level not in ["Undergraduate","Postgraduate","Other"]:
             flash("Please select your study level.", "warning")
             return redirect(url_for("survey"))
-        answers = {}
-        for q in QUESTIONS:
-          if q["type"] == "text":
-            answers[q["key"]] = request.form.get(q["key"], "").strip()[:1000]
+    
+    answers = {}
+
+    for q in QUESTIONS:
+        if q["type"] == "text":
+            answers[q["key"]] = request.form.get(
+                q["key"], ""
+            ).strip()[:1000]
         else:
             val = request.form.get(q["key"], "")
-            if val not in [str(i) for i in range(len(q["options"]))]:
-                print("INVALID SURVEY ANSWER:", q["key"], repr(val))
+
+            if val not in [
+                str(i) for i in range(len(q["options"]))
+            ]:
+                print(
+                    "INVALID SURVEY ANSWER:",
+                    q["key"],
+                    repr(val)
+                )
                 flash(
                     f"Please check your answer for: {q['label']}",
                     "warning"
                 )
                 return redirect(url_for("survey"))
+
             answers[q["key"]] = int(val)
 
     score, indicator = calculate_score(answers)
 
     with db() as c:
         c.execute(
-            "INSERT INTO responses(created_at,age_confirmed,study_level,answers,score,indicator) VALUES(?,?,?,?,?,?)",
+            """INSERT INTO responses
+            (created_at, age_confirmed, study_level, answers, score, indicator)
+            VALUES (?, ?, ?, ?, ?, ?)""",
             (
                 datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 1,
