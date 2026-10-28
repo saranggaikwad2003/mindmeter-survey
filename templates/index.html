@@ -4,7 +4,9 @@
 <div class="charts"><section class="panel"><h2>Daily smartphone use</h2>{% for name,count in use_counts.items() %}<div class="barrow"><span>{{ name }}</span><div class="bar"><i style="width:{{ (count/total*100) if total else 0 }}%"></i></div><b>{{ count }}</b></div>{% endfor %}</section><section class="panel"><h2>Exploratory indicator categories</h2>{% for name,count in indicator_counts.items() %}<div class="barrow"><span>{{ name }}</span><div class="bar"><i style="width:{{ (count/total*100) if total else 0 }}%"></i></div><b>{{ count }}</b></div>{% endfor %}<p class="muted small">These are simple exploratory bands, not a validated scale or diagnosis.</p></section></div>
 <section class="share"><div><h2>Share the survey with students</h2><p>Copy the survey link or share it directly on WhatsApp after this website is online.</p></div><div class="buttons"><button class="btn primary" onclick="copySurvey()">Copy survey link</button><a class="btn" id="wa" target="_blank" rel="noopener">Share on WhatsApp</a><span id="status" class="small"></span></div></section>
 <script>
-function getSurveyLink(){return window.location.origin + "/survey";}
+function getSurveyLink() {
+    return "https://mindmeter-survey.onrender.com/survey";
+}
 async function copySurvey(){let link=getSurveyLink();try{await navigator.clipboard.writeText(link);document.getElementById('status').textContent='Link copied!';}catch(e){window.prompt('Copy this link',link);}}
 document.getElementById('wa').href='https://wa.me/?text='+encodeURIComponent('Please take my anonymous MCA research survey (18+): '+getSurveyLink());
 </script>
